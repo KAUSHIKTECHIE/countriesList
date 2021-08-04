@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_app_countries/fav_countries.dart';
 import 'package:http/http.dart' as http;
+
+import 'favourite_countries.dart';
 
 class CountriesList extends StatefulWidget {
   static const String routeName = "/CountriesList";
@@ -18,12 +19,12 @@ class _CountriesListState extends State<CountriesList> {
   Future<Map<String, dynamic>> serverData;
 
   var favList = new Map<String, dynamic>();
-
   var countryCode = "";
   var countryName = "";
   var regionName = "";
   List<bool> _isFavorited;
   Map<String, dynamic> listData;
+
   @override
   void initState() {
     super.initState();
@@ -38,12 +39,11 @@ class _CountriesListState extends State<CountriesList> {
           backgroundColor: Colors.indigo.withOpacity(0.4),
           leading: IconButton(
             onPressed: () {
-              print("fav...$favList");
               setState(() {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const FavCountriesList(),
+                    builder: (context) => const FavouriteCountriesList(),
                     // Pass the arguments as part of the RouteSettings. The
                     // DetailScreen reads the arguments from these settings.
                     settings: RouteSettings(
@@ -101,56 +101,69 @@ class _CountriesListState extends State<CountriesList> {
           countryCode = listData.keys.elementAt(index);
           countryName = listData[countryCode]["country"];
           regionName = listData[countryCode]["region"];
-          return Container(
-            margin: EdgeInsets.only(left: 20, right: 20),
-            child: Row(
-              children: [
-                Expanded(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('Code - '),
-                        Text('$countryCode'),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text('Name -'),
-                        Expanded(child: Text('$countryName')),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text('Region -'),
-                        Text('$regionName'),
-                      ],
-                    ),
-                    Divider(),
-                  ],
-                )),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      favList = {};
-                      _isFavorited[index] = !_isFavorited[index];
-                      print("Listing...$favList");
-                      for (var i = 0; i <= listData.length - 1; i++) {
-                        _isFavorited[i]
-                            ? favList[listData.keys.elementAt(i)] =
-                                listData[listData.keys.elementAt(i)]
-                            : null;
-                      }
-                      print(favList);
-                    });
-                  },
-                  icon: _isFavorited[index]
-                      ? Icon(Icons.favorite)
-                      : Icon(Icons.favorite_border),
-                ),
-              ],
+          return InkWell(
+            onTap: () {
+              setState(() {
+                favList = {};
+                _isFavorited[index] = !_isFavorited[index];
+                for (var i = 0; i <= listData.length - 1; i++) {
+                  _isFavorited[i]
+                      ? favList[listData.keys.elementAt(i)] =
+                          listData[listData.keys.elementAt(i)]
+                      : null;
+                }
+              });
+            },
+            child: Container(
+              margin: EdgeInsets.only(left: 20, right: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text('Code - '),
+                          Text('$countryCode'),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text('Name -'),
+                          Expanded(child: Text('$countryName')),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text('Region -'),
+                          Text('$regionName'),
+                        ],
+                      ),
+                      Divider(),
+                    ],
+                  )),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        favList = {};
+                        _isFavorited[index] = !_isFavorited[index];
+
+                        for (var i = 0; i <= listData.length - 1; i++) {
+                          _isFavorited[i]
+                              ? favList[listData.keys.elementAt(i)] =
+                                  listData[listData.keys.elementAt(i)]
+                              : null;
+                        }
+                      });
+                    },
+                    icon: _isFavorited[index]
+                        ? Icon(Icons.favorite)
+                        : Icon(Icons.favorite_border),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -162,16 +175,13 @@ class _CountriesListState extends State<CountriesList> {
     String url = 'https://api.first.org/data/v1/countries';
     final response =
         await http.get(url, headers: {"Accept": "application/json"});
-
     if (response.statusCode == 200) {
       _isFavorited =
           List.filled(json.decode(response.body)["data"].length, false);
-      // favList =
-      //     List.filled(json.decode(response.body)["data"].length, {"": ""});
+
       return json.decode(response.body)["data"];
     } else {
-      print("Please check your network connectivity : $response");
-      throw Exception('Failed to load post');
+      throw Exception('Failed to load post ${response.statusCode}');
     }
   }
 }

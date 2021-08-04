@@ -1,9 +1,12 @@
 <<<<<<< HEAD
-# countriesList
+#List of Countries
 =======
-# flutter_app_countries
+# flutter_app
 
-A new Flutter application.
+A new Flutter application with list of countries from api fetched and favourite icon to check and uncheck.
+A screen displaying Favourites list of countries.
+Screens display the code,its name and region it belongs to.
+Flutter app compatible to both iOS and Android phones.
 
 ## Getting Started
 

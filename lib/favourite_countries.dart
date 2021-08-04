@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class FavCountriesList extends StatelessWidget {
-  static const String routeName = "/FavCountriesList";
+class FavouriteCountriesList extends StatelessWidget {
+  static const String routeName = "/FavouriteCountriesList";
 
-  const FavCountriesList({Key key}) : super(key: key);
+  const FavouriteCountriesList({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +19,22 @@ class FavCountriesList extends StatelessWidget {
           color: Colors.indigo.withOpacity(0.4),
           child: Container(
             padding: EdgeInsets.only(top: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                new Container(height: 30, child: Text("Favourite List")),
-                Expanded(
-                    child: getListView(
-                  favList,
-                  "server",
-                )), // snapshot.data is return value of serverData
-              ],
-            ),
+            child: favList.isEmpty
+                ? Center(
+                    child: Text("No Favourite Selected"),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      new Container(height: 30, child: Text("Favourite List")),
+                      Expanded(
+                          child: getListView(
+                        favList,
+                        "server",
+                      )), // snapshot.data is return value of serverData
+                    ],
+                  ),
           ),
         ));
   }
